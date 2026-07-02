@@ -6,7 +6,8 @@ import uuid
 from decimal import Decimal
 
 from app.core.database import get_db
-from app.models.payment import MobileMoneyTransaction, School
+from app.models.payment import MobileMoneyTransaction
+from app.models.school import School
 from app.services.momo import momo_service
 
 router = APIRouter()
