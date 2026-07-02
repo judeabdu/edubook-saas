@@ -1,15 +1,16 @@
 from pydantic import BaseModel
+from uuid import UUID
+from datetime import datetime
 
-class SchoolBase(BaseModel):
+class SchoolCreate(BaseModel):
     name: str
-    license_code: str
+    subdomain: str
 
-class SchoolCreate(SchoolBase):
-    pass
-
-class SchoolResponse(SchoolBase):
-    id: int
-    is_active: bool
+class SchoolOut(BaseModel):
+    id: UUID
+    name: str
+    subdomain: str
+    created_at: datetime
 
     class Config:
         from_attributes = True
