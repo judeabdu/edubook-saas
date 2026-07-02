@@ -13,3 +13,12 @@ SessionLocal = sessionmaker(
 )
 
 Base = declarative_base()
+from contextlib import contextmanager
+
+@contextmanager
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
