@@ -18,23 +18,39 @@ export default function CheckoutPage() {
   const [fetchingSchools, setFetchingSchools] = useState(true);
   const [message, setMessage] = useState({ type: "", text: "" });
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  // Explicit string casting to satisfy strict compilers
+  const API_BASE_URL = String(process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000");
 
   // Automatically fetch live registered schools from the cloud database
   useEffect(() => {
+    let isMounted = true;
+
     async function loadSchools() {
       try {
         const res = await fetch(`${API_BASE_URL}/api/v1/schools/`);
         if (!res.ok) throw new Error("Failed to capture institution indices.");
-        const data = await res.get_db ? await res.json() : await res.json();
-        setSchools(data);
+        
+        const data = await res.json();
+        if (isMounted) {
+          setSchools(Array.isArray(data) ? data : []);
+        }
       } catch (err) {
         console.error("Error pulling schools:", err);
+        if (isMounted) {
+          setMessage({ type: "error", text: "Could not load the schools list. Please refresh." });
+        }
       } finally {
-        setFetchingSchools(false);
+        if (isMounted) {
+          setFetchingSchools(false);
+        }
       }
     }
+
     loadSchools();
+
+    return () => {
+      isMounted = false;
+    };
   }, [API_BASE_URL]);
 
   const handlePayment = async (e: React.FormEvent) => {
@@ -62,7 +78,7 @@ export default function CheckoutPage() {
         text: `🚀 ${data.message || "USSD Pin Prompt dispatched to your handset!"}`,
       });
     } catch (error: any) {
-      setMessage({ type: "error", text: error.message });
+      setMessage({ type: "error", text: error.message || "An unexpected error occurred." });
     } finally {
       setLoading(false);
     }
@@ -92,8 +108,8 @@ export default function CheckoutPage() {
               className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             >
               <option value="">{fetchingSchools ? "Loading institutions..." : "-- Select your School --"}</option>
-              {schools.map((school) => (
-                <option key={school.id} value={school.id}>
+              {schools.map((school, index) => (
+                <option key={school.id || index} value={school.id}>
                   {school.name} ({school.subdomain}.edubook)
                 </option>
               ))}
