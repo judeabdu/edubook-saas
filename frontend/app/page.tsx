@@ -1,23 +1,19 @@
-"use client";
+import React from 'react';
 
-import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
-import Stats from "@/components/Stats";
-import Features from "@/components/Features";
-import HowItWorks from "@/components/HowItWorks";
-import Testimonials from "@/components/Testimonials";
-import Footer from "@/components/Footer";
-
-export default function Home() {
+export default function HomePage() {
   return (
-    <main className="min-h-screen bg-slate-50">
-      <Navbar />
-      <Hero />
-      <Stats />
-      <Features />
-      <HowItWorks />
-      <Testimonials />
-      <Footer />
-    </main>
+    <div className="flex flex-col items-center justify-center min-h-screen p-8 bg-slate-900 text-white font-sans">
+      <div className="max-w-md text-center space-y-4">
+        <h1 className="text-3xl font-extrabold tracking-tight text-indigo-400">
+          EduBook SaaS
+        </h1>
+        <h2 className="text-xl font-semibold text-slate-200">
+          Home Page
+        </h2>
+        <p className="text-sm text-slate-400">
+          This layout is ready. Tomorrow we build the premium frontend.
+        </p>
+      </div>
+    </div>
   );
 }
