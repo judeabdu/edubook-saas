@@ -4,7 +4,6 @@ from datetime import datetime
 import uuid
 
 from app.core.database import Base
-from app.models.school import School  # Import the existing School model
 
 class MobileMoneyTransaction(Base):
     __tablename__ = "momo_transactions"
