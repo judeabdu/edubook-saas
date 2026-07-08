@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { School, LayoutDashboard, CreditCard, Users, History, LogOut } from 'lucide-react';
+import { School, LayoutDashboard, CreditCard, Users, History, LogOut, BarChart3 } from 'lucide-react';
 
 export default function Dashboard() {
   const metrics = [
@@ -21,20 +21,32 @@ export default function Dashboard() {
             <span className="font-bold text-xl tracking-tight">EduBook</span>
           </div>
           <nav className="space-y-2">
-            <button className="w-full flex items-center space-x-3 bg-gray-800 text-blue-400 p-2.5 rounded-lg text-sm font-medium">
+            {/* Overview Link - Currently Active */}
+            <Link href="/dashboard" className="w-full flex items-center space-x-3 bg-gray-800 text-blue-400 p-2.5 rounded-lg text-sm font-medium transition">
               <LayoutDashboard className="h-5 w-5" />
               <span>Overview</span>
-            </button>
-            <button className="w-full flex items-center space-x-3 text-gray-400 hover:bg-gray-800 hover:text-white p-2.5 rounded-lg text-sm font-medium transition">
+            </Link>
+
+            {/* Fee Collection Link */}
+            <Link href="/dashboard/fee-collection" className="w-full flex items-center space-x-3 text-gray-400 hover:bg-gray-800 hover:text-white p-2.5 rounded-lg text-sm font-medium transition">
               <CreditCard className="h-5 w-5" />
               <span>Fee Collection</span>
-            </button>
-            <button className="w-full flex items-center space-x-3 text-gray-400 hover:bg-gray-800 hover:text-white p-2.5 rounded-lg text-sm font-medium transition">
+            </Link>
+
+            {/* Students Link */}
+            <Link href="/dashboard/students" className="w-full flex items-center space-x-3 text-gray-400 hover:bg-gray-800 hover:text-white p-2.5 rounded-lg text-sm font-medium transition">
               <Users className="h-5 w-5" />
               <span>Students</span>
-            </button>
+            </Link>
+
+            {/* Analytics Link */}
+            <Link href="/dashboard/analytics" className="w-full flex items-center space-x-3 text-gray-400 hover:bg-gray-800 hover:text-white p-2.5 rounded-lg text-sm font-medium transition">
+              <BarChart3 className="h-5 w-5" />
+              <span>Analytics</span>
+            </Link>
           </nav>
         </div>
+        
         <Link href="/" className="flex items-center space-x-3 text-gray-400 hover:text-red-400 text-sm font-medium pt-4 border-t border-gray-800 transition">
           <LogOut className="h-5 w-5" />
           <span>Exit Workspace</span>
