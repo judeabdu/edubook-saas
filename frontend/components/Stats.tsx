@@ -1,77 +1,22 @@
-"use client";
+export default function Stats() {
+  const stats = [
+    { id: 1, name: 'Active Institutions', value: '150+' },
+    { id: 2, name: 'Fees Processed Safely', value: '$2.4M+' },
+    { id: 3, name: 'Parent Satisfaction Rate', value: '99.2%' },
+  ];
 
-import { Building2, GraduationCap, Wallet, Activity } from "lucide-react";
-
-const stats = [
-  {
-    icon: Building2,
-    number: "500+",
-    title: "Schools"
-  },
-  {
-    icon: GraduationCap,
-    number: "100K+",
-    title: "Students"
-  },
-  {
-    icon: Wallet,
-    number: "UGX 20B+",
-    title: "Payments"
-  },
-  {
-    icon: Activity,
-    number: "99.9%",
-    title: "Uptime"
-  }
-];
-
-export default function Stats(){
-
-return(
-
-<section className="bg-white py-16">
-
-<div className="mx-auto max-w-7xl px-6">
-
-<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-
-{stats.map((item)=>{
-
-const Icon=item.icon;
-
-return(
-
-<div
-key={item.title}
-className="rounded-2xl border p-8 text-center shadow-sm hover:shadow-xl transition"
->
-
-<div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100">
-
-<Icon className="text-indigo-600"/>
-
-</div>
-
-<h2 className="mt-5 text-4xl font-black">
-{item.number}
-</h2>
-
-<p className="mt-2 text-slate-500">
-{item.title}
-</p>
-
-</div>
-
-)
-
-})}
-
-</div>
-
-</div>
-
-</section>
-
-)
-
+  return (
+    <section className="bg-blue-600 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 text-center">
+          {stats.map((stat) => (
+            <div key={stat.id} className="flex flex-col">
+              <dd className="text-4xl font-extrabold text-white sm:text-5xl">{stat.value}</dd>
+              <dt className="mt-2 text-sm font-medium text-blue-100 uppercase tracking-wider">{stat.name}</dt>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
