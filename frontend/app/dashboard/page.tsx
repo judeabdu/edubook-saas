@@ -1,61 +1,78 @@
-import React from 'react';
+'use client';
 
-export default function Home() {
-  const phases = [
-    { name: "Phase 1: Public Portal & Payments", status: "In Progress", color: "text-amber-400" },
-    { name: "Phase 2: School Authentication", status: "Scheduled", color: "text-slate-500" },
-    { name: "Phase 3: Multi-tenant School Dashboard", status: "Scheduled", color: "text-slate-500" },
-    { name: "Phase 4: Super Admin Control Panel", status: "Scheduled", color: "text-slate-500" },
+import React from 'react';
+import Link from 'next/link';
+import { School, LayoutDashboard, CreditCard, Users, History, LogOut } from 'lucide-react';
+
+export default function Dashboard() {
+  const metrics = [
+    { label: 'Total Fees Collected', value: '$12,450', change: '+14% this month' },
+    { label: 'Pending Invoices', value: '42', change: 'Requires review' },
+    { label: 'Active Registered Students', value: '380', change: '2 branches' },
   ];
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen bg-[#0B0F19] text-slate-100 font-sans overflow-hidden">
-      {/* Premium background gradient glows */}
-      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-indigo-900/20 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-emerald-900/10 blur-[120px] pointer-events-none" />
-
-      <div className="relative z-10 max-w-2xl w-full px-6 text-center space-y-10">
-        {/* Header Badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-medium tracking-wide mx-auto">
-          <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
-          Production Environment Active
-        </div>
-
-        {/* Project Branding */}
-        <div className="space-y-3">
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-            EduBook <span className="text-indigo-400">SaaS</span>
-          </h1>
-          <p className="text-base md:text-lg text-slate-400 max-w-md mx-auto">
-            The modern, premium management and continuous-billing ecosystem engineered for forward-thinking schools.
-          </p>
-        </div>
-
-        {/* Roadmap Preview Card */}
-        <div className="bg-slate-900/50 border border-slate-800/80 backdrop-blur-md rounded-2xl p-6 text-left shadow-xl space-y-4 max-w-lg mx-auto">
-          <h3 className="text-sm font-semibold text-slate-300 tracking-wider uppercase">
-            Deployment Roadmap
-          </h3>
-          
-          <div className="space-y-3">
-            {phases.map((phase, idx) => (
-              <div key={idx} className="flex items-center justify-between border-b border-slate-800/40 pb-2 last:border-0 last:pb-0">
-                <span className="text-sm font-medium text-slate-400">{phase.name}</span>
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-md bg-slate-800 ${phase.color}`}>
-                  {phase.status}
-                </span>
-              </div>
-            ))}
+    <div className="min-h-screen bg-gray-100 flex">
+      {/* Sidebar navigation alignment */}
+      <aside className="w-64 bg-gray-900 text-white flex flex-col justify-between p-6">
+        <div className="space-y-8">
+          <div className="flex items-center space-x-2">
+            <School className="h-6 w-6 text-blue-400" />
+            <span className="font-bold text-xl tracking-tight">EduBook</span>
           </div>
+          <nav className="space-y-2">
+            <button className="w-full flex items-center space-x-3 bg-gray-800 text-blue-400 p-2.5 rounded-lg text-sm font-medium">
+              <LayoutDashboard className="h-5 w-5" />
+              <span>Overview</span>
+            </button>
+            <button className="w-full flex items-center space-x-3 text-gray-400 hover:bg-gray-800 hover:text-white p-2.5 rounded-lg text-sm font-medium transition">
+              <CreditCard className="h-5 w-5" />
+              <span>Fee Collection</span>
+            </button>
+            <button className="w-full flex items-center space-x-3 text-gray-400 hover:bg-gray-800 hover:text-white p-2.5 rounded-lg text-sm font-medium transition">
+              <Users className="h-5 w-5" />
+              <span>Students</span>
+            </button>
+          </nav>
         </div>
+        <Link href="/" className="flex items-center space-x-3 text-gray-400 hover:text-red-400 text-sm font-medium pt-4 border-t border-gray-800 transition">
+          <LogOut className="h-5 w-5" />
+          <span>Exit Workspace</span>
+        </Link>
+      </aside>
 
-        {/* Footer info */}
-        <div className="pt-4 border-t border-slate-900 max-w-xs mx-auto">
-          <p className="text-xs text-slate-500 tracking-wide">
-            Next Sync: Frontend implementation kicks off tomorrow.
-          </p>
-        </div>
-      </div>
+      {/* Primary Dashboard Working Screen content view */}
+      <main className="flex-1 p-8 overflow-y-auto">
+        <header className="flex justify-between items-center mb-8 pb-4 border-b border-gray-200">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Administrative Overview</h1>
+            <p className="text-sm text-gray-500">Welcome back, Main Office Administrator</p>
+          </div>
+          <div className="bg-white border border-gray-200 px-4 py-2 rounded-lg text-xs font-semibold text-blue-600">
+            Tenant: Active Branch Sync
+          </div>
+        </header>
+
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {metrics.map((m, idx) => (
+            <div key={idx} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">{m.label}</span>
+              <div className="text-3xl font-extrabold text-gray-900 mt-2">{m.value}</div>
+              <div className="text-xs font-medium text-emerald-600 mt-2">{m.change}</div>
+            </div>
+          ))}
+        </section>
+
+        <section className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+          <div className="flex items-center space-x-2 text-gray-900 font-bold mb-4">
+            <History className="h-5 w-5 text-gray-400" />
+            <h2>Recent Payment Real-Time Ledger Logs</h2>
+          </div>
+          <div className="text-center py-8 text-sm text-gray-400 italic">
+            Connected live back-end instances are checking queries...
+          </div>
+        </section>
+      </main>
     </div>
   );
 }

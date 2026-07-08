@@ -1,61 +1,66 @@
+'use client';
+
 import React from 'react';
+import Link from 'next/link';
+import { Shield, Settings, Sliders, LayoutDashboard, Database, ArrowLeft } from 'lucide-react';
 
-export default function Home() {
-  const phases = [
-    { name: "Phase 1: Public Portal & Payments", status: "In Progress", color: "text-amber-400" },
-    { name: "Phase 2: School Authentication", status: "Scheduled", color: "text-slate-500" },
-    { name: "Phase 3: Multi-tenant School Dashboard", status: "Scheduled", color: "text-slate-500" },
-    { name: "Phase 4: Super Admin Control Panel", status: "Scheduled", color: "text-slate-500" },
-  ];
-
+export default function AdminPanel() {
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen bg-[#0B0F19] text-slate-100 font-sans overflow-hidden">
-      {/* Premium background gradient glows */}
-      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-indigo-900/20 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-emerald-900/10 blur-[120px] pointer-events-none" />
-
-      <div className="relative z-10 max-w-2xl w-full px-6 text-center space-y-10">
-        {/* Header Badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-medium tracking-wide mx-auto">
-          <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
-          Production Environment Active
+    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+      <aside className="w-full md:w-64 bg-gray-900 text-white p-6 flex flex-col justify-between">
+        <div className="space-y-8">
+          <div className="flex items-center space-x-2">
+            <Shield className="h-6 w-6 text-indigo-400" />
+            <span className="font-bold text-xl tracking-tight">SuperAdmin</span>
+          </div>
+          <nav className="space-y-2">
+            <div className="flex items-center space-x-3 bg-gray-800 text-indigo-400 p-2.5 rounded-lg text-sm font-medium">
+              <Settings className="h-4 w-4" />
+              <span>System Configuration</span>
+            </div>
+            <div className="flex items-center space-x-3 text-gray-400 p-2.5 rounded-lg text-sm font-medium">
+              <Database className="h-4 w-4" />
+              <span>Tenant Databases</span>
+            </div>
+          </nav>
         </div>
+        <Link href="/dashboard" className="flex items-center space-x-2 text-sm text-gray-400 hover:text-white transition pt-4 border-t border-gray-800">
+          <ArrowLeft className="h-4 w-4" />
+          <span>Back to Dashboard</span>
+        </Link>
+      </aside>
 
-        {/* Project Branding */}
-        <div className="space-y-3">
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-            EduBook <span className="text-indigo-400">SaaS</span>
-          </h1>
-          <p className="text-base md:text-lg text-slate-400 max-w-md mx-auto">
-            The modern, premium management and continuous-billing ecosystem engineered for forward-thinking schools.
-          </p>
-        </div>
+      <main className="flex-1 p-8 md:p-12">
+        <header className="mb-8">
+          <h1 className="text-3xl font-extrabold text-gray-900">System Controls</h1>
+          <p className="text-sm text-gray-500 mt-1">Manage network parameters, cross-tenant isolation profiles, and active clusters.</p>
+        </header>
 
-        {/* Roadmap Preview Card */}
-        <div className="bg-slate-900/50 border border-slate-800/80 backdrop-blur-md rounded-2xl p-6 text-left shadow-xl space-y-4 max-w-lg mx-auto">
-          <h3 className="text-sm font-semibold text-slate-300 tracking-wider uppercase">
-            Deployment Roadmap
-          </h3>
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 max-w-3xl">
+          <div className="flex items-center space-x-2 mb-6 text-gray-800 font-bold">
+            <Sliders className="h-5 w-5 text-indigo-500" />
+            <h2>Global Tenant Rule Allocations</h2>
+          </div>
           
-          <div className="space-y-3">
-            {phases.map((phase, idx) => (
-              <div key={idx} className="flex items-center justify-between border-b border-slate-800/40 pb-2 last:border-0 last:pb-0">
-                <span className="text-sm font-medium text-slate-400">{phase.name}</span>
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-md bg-slate-800 ${phase.color}`}>
-                  {phase.status}
-                </span>
+          <div className="space-y-4">
+            <div className="p-4 bg-gray-50 rounded-lg flex justify-between items-center">
+              <div>
+                <p className="text-sm font-semibold text-gray-800">Enforce Hard Multi-Tenancy Matrix</p>
+                <p className="text-xs text-gray-500">Isolate database schema routing completely at connection strings boundaries.</p>
               </div>
-            ))}
+              <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full">ACTIVE</span>
+            </div>
+
+            <div className="p-4 bg-gray-50 rounded-lg flex justify-between items-center">
+              <div>
+                <p className="text-sm font-semibold text-gray-800">Global Webhook Influx Gate</p>
+                <p className="text-xs text-gray-500">Reroute mobile money validation calls through automated fallback relays.</p>
+              </div>
+              <span className="bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-1 rounded-full">STANDBY</span>
+            </div>
           </div>
         </div>
-
-        {/* Footer info */}
-        <div className="pt-4 border-t border-slate-900 max-w-xs mx-auto">
-          <p className="text-xs text-slate-500 tracking-wide">
-            Next Sync: Frontend implementation kicks off tomorrow.
-          </p>
-        </div>
-      </div>
+      </main>
     </div>
   );
 }
