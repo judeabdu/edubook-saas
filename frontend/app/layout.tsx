@@ -1,4 +1,5 @@
 import React from "react";
+import "./globals.css"; // <-- This is the missing link!
 
 export default function RootLayout({
   children,
@@ -7,7 +8,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body style={{ margin: 0, fontFamily: "Arial, sans-serif" }}>
+      <body className="bg-white text-gray-900 antialiased">
         {children}
       </body>
     </html>
