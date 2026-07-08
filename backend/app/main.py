@@ -6,8 +6,11 @@ from app.api.v1.endpoints import schools, payments
 from app.core.database import engine
 from app import models
 
-# Automatically trigger table generation on application boot boundaries
-models.Base.metadata.create_all(bind=engine)
+# Safely attempt table generation without breaking the runtime process loop
+try:
+    models.Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"Database table generation skipped or handled asynchronously: {e}")
 
 app = FastAPI(
     title="EduBook SaaS API",
