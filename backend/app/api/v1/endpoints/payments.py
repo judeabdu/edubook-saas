@@ -1,80 +1,86 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from pydantic import BaseModel, Field
-from typing import Any
-import uuid
-from decimal import Decimal
-
+from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.models.payment import MobileMoneyTransaction
-from app.models.school import School
-from app.services.momo import momo_service
+from app import models
+from pydantic import BaseModel, Field
+from typing import List
+from decimal import Decimal
 
 router = APIRouter()
 
-# Schema for incoming fees collections
-class PaymentInitiateRequest(BaseModel):
-    school_id: uuid.UUID = Field(..., description="The unique tenant school ID")
-    amount: Decimal = Field(..., gt=0, description="Payment transaction total amount")
-    phone_number: str = Field(..., example="256771234567")
-    student_identifier: str = Field(..., description="Roll registration code or student tracking index")
+# Schema for initiating a payment
+class PaymentInitiate(BaseModel):
+    school_id: str
+    student_id: str
+    amount: Decimal = Field(..., gt=0, description="Amount to be paid")
+    payment_method: str = "MOBILE_MONEY"  # MOBILE_MONEY, BANK_SLIP, CASH
+    payer_name: str
+
+# Schema for simulating a network webhook confirmation callback
+class WebhookCallback(BaseModel):
+    transaction_reference: str
+    status: str  # SUCCESS or FAILED
 
 @router.post("/initiate", status_code=status.HTTP_201_CREATED)
-async def initiate_fee_payment(
-    payload: PaymentInitiateRequest,
-    db: AsyncSession = Depends(get_db)
-) -> Any:
-    """
-    Creates a localized system ledger record and pushes a structural payload 
-    to trigger a handset authorization loop.
-    """
-    # 1. Verify that the school tenant partition exists inside the multi-tenant engine
-    school_check = await db.get(School, payload.school_id)
-    if not school_check:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="The targeted multi-tenant school partition context was not identified."
-        )
-
-    # 2. Build our system tracking reference entity layout
-    transaction_id = uuid.uuid4()
+def initiate_payment(payment_in: PaymentInitiate, db: Session = Depends(get_db)):
+    # 1. Verify the student exists and belongs to the designated school tenant
+    student = db.query(models.Student).filter(
+        models.Student.id == payment_in.student_id,
+        models.Student.school_id == payment_in.school_id
+    ).first()
     
-    new_transaction = MobileMoneyTransaction(
-        id=transaction_id,
-        school_id=payload.school_id,
-        amount=payload.amount,
-        phone_number=payload.phone_number,
-        student_identifier=payload.student_identifier,
-        status="PENDING"
-    )
-
-    db.add(new_transaction)
-    await db.flush()  # Extract state adjustments cleanly without dropping the database handle scope
-
-    # 3. Dispatches payload processing asynchronously to the gateway
-    momo_response = await momo_service.initiate_collection(
-        amount=payload.amount,
-        phone_number=payload.phone_number,
-        reference_id=str(transaction_id),
-        student_id=payload.student_identifier
-    )
-
-    if not momo_response["success"]:
-        # Update record fallback immediately inside tracking history lifecycle
-        new_transaction.status = "FAILED"
-        await db.commit()
+    if not student:
         raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=momo_response["message"]
+            status_code=404, 
+            detail="Student record not found within this school workspace."
         )
-
-    # Persist the system references cleanly
-    new_transaction.provider_reference = str(transaction_id)
-    await db.commit()
-
+    
+    # 2. Log the transaction into the ledger as PENDING
+    import uuid
+    tx_ref = f"EB-TX-{uuid.uuid4().hex[:8].upper()}"
+    
+    new_payment = models.Payment(
+        school_id=payment_in.school_id,
+        student_id=payment_in.student_id,
+        amount=payment_in.amount,
+        payment_method=payment_in.payment_method,
+        status="PENDING",
+        transaction_reference=tx_ref,
+        payer_name=payment_in.payer_name
+    )
+    
+    db.add(new_payment)
+    db.commit()
+    db.refresh(new_payment)
+    
     return {
-        "transaction_id": transaction_id,
-        "school": school_check.name,
-        "status": new_transaction.status,
-        "message": momo_response["message"]
+        "message": "Payment transaction initiated successfully.",
+        "transaction_reference": tx_ref,
+        "status": "PENDING"
     }
+
+@router.post("/webhook/callback")
+def payment_webhook_callback(payload: WebhookCallback, db: Session = Depends(get_db)):
+    # Find the corresponding transaction entry
+    payment = db.query(models.Payment).filter(
+        models.Payment.transaction_reference == payload.transaction_reference
+    ).first()
+    
+    if not payment:
+        raise HTTPException(status_code=404, detail="Transaction reference not found.")
+        
+    if payment.status != "PENDING":
+        return {"message": "Transaction has already been processed settled.", "status": payment.status}
+        
+    # Update payment status
+    payment.status = payload.status
+    
+    # If the transaction is verified successful, dynamically offset the student's ledger arrears balance
+    if payload.status == "SUCCESS":
+        student = db.query(models.Student).filter(models.Student.id == payment.student_id).first()
+        if student:
+            # Increment total amount paid
+            student.fees_paid = (student.fees_paid or Decimal("0.00")) + payment.amount
+            
+    db.commit()
+    return {"message": f"Ledger reconciled successfully as {payload.status}."}

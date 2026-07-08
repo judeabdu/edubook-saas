@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app import models
 from pydantic import BaseModel, EmailStr
-from typing import List
 
 router = APIRouter()
 
@@ -14,7 +13,7 @@ class SchoolCreate(BaseModel):
     admin_email: EmailStr
     phone_number: str
 
-@post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 def onboard_school(school_in: SchoolCreate, db: Session = Depends(get_db)):
     # Verify slug uniqueness to preserve routing boundaries
     existing_slug = db.query(models.School).filter(models.School.slug == school_in.slug).first()
@@ -32,7 +31,7 @@ def onboard_school(school_in: SchoolCreate, db: Session = Depends(get_db)):
     db.refresh(new_school)
     return {"message": "School onboarded successfully", "school_id": new_school.id}
 
-@get("/{school_id}/analytics")
+@router.get("/{school_id}/analytics")
 def get_school_dashboard_metrics(school_id: str, db: Session = Depends(get_db)):
     # Dynamically compute running financial states across this unique tenant isolate
     school = db.query(models.School).filter(models.School.id == school_id).first()
