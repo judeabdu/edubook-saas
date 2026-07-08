@@ -1,6 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.v1.endpoints import schools, payments  # Added payments here
+from app.api.v1.endpoints import schools, payments
+
+# Import your database core assets and models
+from app.core.database import engine
+from app import models
+
+# Automatically trigger table generation on application boot boundaries
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="EduBook SaaS API",
@@ -8,9 +15,16 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Explicitly trust your active live frontend URL for credentialed handshakes
+origins = [
+    "https://edubook-saas-yhhw.vercel.app",  # Your live frontend site
+    "http://localhost:3000",                  # Local Next.js testing
+    "http://127.0.0.1:3000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -18,7 +32,7 @@ app.add_middleware(
 
 # Include Routers
 app.include_router(schools.router, prefix="/api/v1/schools", tags=["Schools"])
-app.include_router(payments.router, prefix="/api/v1/payments", tags=["Payments"])  # Added payments route
+app.include_router(payments.router, prefix="/api/v1/payments", tags=["Payments"])
 
 @app.get("/")
 def read_root():
